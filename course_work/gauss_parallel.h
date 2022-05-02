@@ -27,17 +27,23 @@ inline int parallel_find_max_inCol(const std::vector<std::vector<T>>& matrix, in
     окажется равным нулю — в этом случае выполняют перестановку строк матрицы.
     Наиболее эффективным подходом к перестановке строк является перестановка i-той строки со строкой,
     имеющей максимальный по модулю элемент в i-том столбце.*/
-    
-    T max = std::abs(matrix[col][col]); // модуль значения элемента
+
     int maxPos = col; // номер строки, на которой находится максимальный элемент
-    #pragma omp parallel for shared(max, maxPos) num_threads(10)
-    for (int i = col + 1; i < rowsAmount; i++)
+    #pragma omp parallel shared(maxPos) num_threads(10)
     {
-        T element = std::abs(matrix[i][col]); // Берём новый элемент из столбца
-        if (element > max) // Если значение по модулю нового элемента больше уже имеющегося максимума, то
+        T max = std::abs(matrix[col][col]); // модуль значения элемента
+        #pragma omp for
+        for (int i = col + 1; i < rowsAmount; i++)
         {
-            max = element; // обновляем максимум
-            maxPos = i; // и запоминаем номер строки, на которой находится максимальный элемент
+            T element = std::abs(matrix[i][col]); // Берём новый элемент из столбца
+            #pragma omp critical
+            {
+                if (element > max) // Если значение по модулю нового элемента больше уже имеющегося максимума, то
+                {
+                    max = element; // обновляем максимум
+                    maxPos = i; // и запоминаем номер строки, на которой находится максимальный элемент
+                }
+            }
         }
     }
 
@@ -60,13 +66,15 @@ inline int parallel_triangulate_matrix(std::vector<std::vector<T>>& matrix, int 
 
         if (i != imax) // Если текущий элемент не является максимальным, то
         {
-            swap(matrix[i], matrix[imax]); // переставляем строки
+            std::swap(matrix[i], matrix[imax]); // переставляем строки
             swapCounter++; // считаем количество таких операций, т. к. такое действие меняет знак определителя
         }
-        #pragma omp parallel for shared(num_cols, imax, swapCounter) collapse(2) num_threads(10)
+        
         for (int j = i + 1; j < rowsAmount; j++)
         {
             T coeff = -matrix[j][i] / matrix[i][i]; // вычислили коэффициент для обнуления элемента i-й строки
+            
+            #pragma omp parallel for shared(num_cols) num_threads(10)
             for (int k = i; k < num_cols; k++)
                 matrix[j][k] += matrix[i][k] * coeff; // обнуляем элемент и складываем строки
         }
@@ -79,6 +87,7 @@ template<typename T>
 inline std::vector<T> parallel_gauss_solving(std::vector<std::vector<T>>& matrix, std::vector<T>& freeMatrixColumn, int rowsAmount)
 { // Здесь решаем СЛАУ методом Гаусса
     std::vector<T> solution(rowsAmount); // результирующий вектор
+
     #pragma omp parallel for num_threads(10)
     for (int i = 0; i < rowsAmount; i++)
         matrix[i].push_back(freeMatrixColumn[i]); // добавляем столбец свободных членов
@@ -87,18 +96,16 @@ inline std::vector<T> parallel_gauss_solving(std::vector<std::vector<T>>& matrix
 
     /* При использовании метода Гаусса для решения
     систем линейных алгебраических уравнений следует избегать приближенных вычислений */
-    #pragma omp parallel for collapse(2) num_threads(10)
+
     for (int i = rowsAmount - 1; i >= 0; i--)
     { // Обходим уравнения с конца матрицы
         if (std::abs(matrix[i][i]) < 0.0001)
             throw parallel_no_solution();
         // Уравнения перебираются начиная с последнего
+        #pragma omp parallel for num_threads(10)
         for (int j = i + 1; j < rowsAmount; j++) // для каждого из них вычисляется сумма matrix[i][j] * solution[j]
-        {
-            #pragma omp critical
             matrix[i][rowsAmount] -= matrix[i][j] * solution[j];
-        }
-        //#pragma omp critical
+
         solution[i] = matrix[i][rowsAmount] / matrix[i][i]; // находим значение корня текущего уравнения
     }
 
