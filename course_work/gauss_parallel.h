@@ -27,7 +27,7 @@ inline int parallel_find_max_inCol(const std::vector<std::vector<T>>& matrix, in
     окажется равным нулю — в этом случае выполняют перестановку строк матрицы.
     Наиболее эффективным подходом к перестановке строк является перестановка i-той строки со строкой,
     имеющей максимальный по модулю элемент в i-том столбце.*/
-
+    
     T max = std::abs(matrix[col][col]); // модуль значения элемента
     int maxPos = col; // номер строки, на которой находится максимальный элемент
     #pragma omp parallel for shared(max, maxPos) num_threads(10)

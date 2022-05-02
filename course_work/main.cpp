@@ -1,5 +1,4 @@
 #include <iostream>
-//#include <omp.h>
 #include <vector>
 #include <cmath>
 #include "gauss_serial.h"
@@ -20,9 +19,7 @@ int main()
     printf("Укажите размерность матрицы\n");
     printf("Количество строк: ");
     std::cin >> m;
-    //freeMatrixColumn_s.resize(m);
     matrix_s.resize(m);
-    //freeMatrixColumn_p.resize(m);
     matrix_p.resize(m);
     printf("Количество столбцов: ");
     std::cin >> n;
