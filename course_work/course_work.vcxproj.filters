@@ -26,5 +26,8 @@
     <ClInclude Include="gauss_parallel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="huge_matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -29,7 +29,7 @@ inline int parallel_find_max_inCol(const std::vector<std::vector<T>>& matrix, in
     имеющей максимальный по модулю элемент в i-том столбце.*/
 
     int maxPos = col; // номер строки, на которой находится максимальный элемент
-    #pragma omp parallel shared(maxPos) num_threads(10)
+    #pragma omp parallel shared(maxPos) num_threads(8)
     {
         T max = std::abs(matrix[col][col]); // модуль значения элемента
         #pragma omp for
@@ -74,7 +74,7 @@ inline int parallel_triangulate_matrix(std::vector<std::vector<T>>& matrix, int 
         {
             T coeff = -matrix[j][i] / matrix[i][i]; // вычислили коэффициент для обнуления элемента i-й строки
             
-            #pragma omp parallel for shared(num_cols) num_threads(10)
+            #pragma omp parallel for shared(num_cols) num_threads(8)
             for (int k = i; k < num_cols; k++)
                 matrix[j][k] += matrix[i][k] * coeff; // обнуляем элемент и складываем строки
         }
@@ -88,7 +88,7 @@ inline std::vector<T> parallel_gauss_solving(std::vector<std::vector<T>>& matrix
 { // Здесь решаем СЛАУ методом Гаусса
     std::vector<T> solution(rowsAmount); // результирующий вектор
 
-    #pragma omp parallel for num_threads(10)
+    #pragma omp parallel for num_threads(8)
     for (int i = 0; i < rowsAmount; i++)
         matrix[i].push_back(freeMatrixColumn[i]); // добавляем столбец свободных членов
 
@@ -102,7 +102,6 @@ inline std::vector<T> parallel_gauss_solving(std::vector<std::vector<T>>& matrix
         if (std::abs(matrix[i][i]) < 0.0001)
             throw parallel_no_solution();
         // Уравнения перебираются начиная с последнего
-        #pragma omp parallel for num_threads(10)
         for (int j = i + 1; j < rowsAmount; j++) // для каждого из них вычисляется сумма matrix[i][j] * solution[j]
             matrix[i][rowsAmount] -= matrix[i][j] * solution[j];
 
