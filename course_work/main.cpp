@@ -32,9 +32,9 @@ int main()
     matrix_for_checking.resize(matrix_dimension);
 
     printf("\nСоздаю матрицу размером: %d×%d", matrix_dimension, matrix_dimension);
-    create_huge_matrix(matrix_s, 5, matrix_dimension); // генерируем 1 экземпляр
+    CreateHugeMatrix(matrix_s, 5, matrix_dimension); // генерируем 1 экземпляр
     matrix_for_checking = matrix_p = matrix_s; // и все остальные одинаковые
-    create_freeMatrixColumn(freeMatrixColumn_s, matrix_dimension);
+    CreateFreeMatrixColumn(freeMatrixColumn_s, matrix_dimension);
     free_matrix_column_for_checking = freeMatrixColumn_p = freeMatrixColumn_s;
 
     //// Заполняем матрицу
