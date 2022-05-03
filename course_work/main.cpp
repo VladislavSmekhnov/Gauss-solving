@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <string>
 #include <omp.h>
 #include "gauss_sequential.h"
 #include "gauss_parallel.h"
@@ -9,6 +10,8 @@
 void Keep4DigitsAfterPoint(std::vector<double>& v);
 void CreateNewFreeColumn(std::vector<double>& v, std::vector<double>& answer, std::vector<std::vector<double>> matrix);
 bool CheckAnswer(std::vector<double> answer, std::vector<double> freeMatrixCloumn, std::vector<std::vector<double>> matrix);
+template <typename T>
+void PrintVector(std::vector<T>& x);
 
 int main()
 {
@@ -85,39 +88,22 @@ int main()
     // Заполняем матрицу
     
 
-    /* Последовательное решение : */
+    
     printf("\n\nРешаю...\n");
 
     printf("Последовательно...\n");
-
+    /* Последовательное решение : */
     timeStart_s = omp_get_wtime();
     answer_s = SolveSequentially(matrix_s, freeMatrixColumn_s, matrix_dimension);
     timeEnd_s = omp_get_wtime();
     tick_s = omp_get_wtick();
 
     printf("Параллельно...\n");
-
+    /* Параллельное решение : */
     timeStart_p = omp_get_wtime();
     answer_p = SolveInParallel(matrix_p, freeMatrixColumn_p, matrix_dimension);
     timeEnd_p = omp_get_wtime();
     tick_p = omp_get_wtick();
-
-    //printf("Ответ (последовательное решение):\n");
-    // Ответ:
-    //for (int i = 0; i < answer_s.size(); i++)
-    //    std::cout << answer_s[i] << " ";
-
-    //printf("\n");
-    ///* Конец последовательного решения */
-
-    ///* Параллельное решение : */
-    //printf("Ответ (параллельное решение):\n");
-    // Ответ:
-    //for (int i = 0; i < answer_p.size(); i++)
-    //    std::cout << answer_p[i] << " ";
-
-    //printf("\n");
-    /* Конец параллельного решения */
     
     // Измеряем время, затраченное на решение СЛАУ обоими способами:
     printf("\nВремя, затраченное в последовательной области:\t%1f\n", timeEnd_s - timeStart_s);
@@ -132,6 +118,10 @@ int main()
     /* Проверка параллельного решения */
     std::cout << std::boolalpha << "Параллельное решение верно:\t" <<
         CheckAnswer(answer_p, free_matrix_column_for_checking, matrix_for_checking) << std::endl;
+
+    printf("Вывести ли ответы? (0 - нет, 1 - да): ");
+    std::cin >> value;
+    if (value == 1) PrintVectorS(answer_s);
 
     system("pause");
     return 0;

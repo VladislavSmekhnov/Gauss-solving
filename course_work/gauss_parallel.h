@@ -11,6 +11,8 @@ int ParallelNoSolution()
     return 0;
 }
 template <typename T>
+void PrintVectorP(std::vector<T>& x);
+template <typename T>
 int ParallelFindMaxInCol(const std::vector<std::vector<T>>& matrix, int col, int matrix_dimension);
 template <typename T>
 int ParallelTriangulateMatrix(std::vector<std::vector<T>>& matrix, int matrix_dimension);
@@ -109,4 +111,56 @@ inline std::vector<T> SolveInParallel(std::vector<std::vector<T>>& matrix, std::
     }
 
     return solution;
+}
+
+template <typename T>
+inline void PrintVectorP(std::vector<T>& x)
+{
+    unsigned int y, length;
+
+    std::cout << "Количество решений СЛАУ = " << x.size() << std::endl;
+
+    if (x.size() > 50)
+    {
+        std::cout << "Вывести полностью или частично? (1 - полностью, 2 - частично): ";
+        std::cin >> y;
+        if (y == 1)
+        {
+            for (int i = 0; i < x.size(); i++)
+            {
+                std::cout << x[i] << " ";
+                if (i % 12 == 0 && i > 0) printf("\n");
+            }
+            printf("\n");
+        }
+        else if (y == 2)
+        {
+            printf("Количество элементов для вывода за раз: ");
+            std::cin >> length;
+            int step = length;
+            for (int i = 0; i < x.size(); )
+            {
+                for (; i < length; i++)
+                {
+                    std::cout << x[i] << " ";
+                }
+                printf("\n");
+                length = (length + step) % (x.size() + 1);
+                if (length == x.size()) break;
+                printf("0 - выход, 1 - продолжить вывод корней СЛАУ: ");
+                std::cin >> y;
+                if (y == 0) break;
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < x.size(); i++)
+        {
+            std::cout << x[i] << " ";
+            if (i % 12 == 0 && 1 > 0) printf("\n");
+        }
+        printf("\n");
+    }
+
 }
