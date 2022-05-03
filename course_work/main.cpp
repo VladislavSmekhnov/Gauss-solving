@@ -72,7 +72,7 @@ int main()
     printf("Параллельно...\n");
 
     timeStart_p = omp_get_wtime();
-    answer_p = parallel_gauss_solving(matrix_p, freeMatrixColumn_p, matrix_dimension);
+    answer_p = SolveInParallel(matrix_p, freeMatrixColumn_p, matrix_dimension);
     timeEnd_p = omp_get_wtime();
     tick_p = omp_get_wtick();
 
