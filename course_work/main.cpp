@@ -65,7 +65,7 @@ int main()
     printf("Последовательно...\n");
 
     timeStart_s = omp_get_wtime();
-    answer_s = gauss_solving(matrix_s, freeMatrixColumn_s, matrix_dimension);
+    answer_s = SolveSequentially(matrix_s, freeMatrixColumn_s, matrix_dimension);
     timeEnd_s = omp_get_wtime();
     tick_s = omp_get_wtick();
 

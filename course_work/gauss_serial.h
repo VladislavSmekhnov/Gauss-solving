@@ -3,21 +3,21 @@
 #include <vector>
 #include <iostream>
 //=============================================================================================================
-int no_solution()
+int NoSolution()
 {
     std::cerr << "Нет решения!" << std::endl;
     exit(-1);
     return 0;
 }
 template <typename T>
-int find_max_inCol(const std::vector<std::vector<T>>& matrix, int col, int rowsAmount);
+int FindMaxInCol(const std::vector<std::vector<T>>& matrix, int col, int matrix_dimension);
 template <typename T>
-int triangulate_matrix(std::vector<std::vector<T>>& matrix, int rowsAmount);
+int TriangulateMatrix(std::vector<std::vector<T>>& matrix, int matrix_dimension);
 template <typename T>
-std::vector<T> gauss_solving(std::vector<std::vector<T>>& matrix, std::vector<T>& freeMatrixColumn, int rowsAmount);
+std::vector<T> SolveSequentially(std::vector<std::vector<T>>& matrix, std::vector<T>& freeMatrixColumn, int matrix_dimension);
 //=============================================================================================================
 template<typename T>
-inline int find_max_inCol(const std::vector<std::vector<T>>& matrix, int col, int rowsAmount)
+inline int FindMaxInCol(const std::vector<std::vector<T>>& matrix, int col, int matrix_dimension)
 { // Здесь ищем максимальный элемент в столбце
     /*Суть алгоритма:
     Для «обнуления» элементов i-го столбца матрицы достаточно
@@ -28,42 +28,42 @@ inline int find_max_inCol(const std::vector<std::vector<T>>& matrix, int col, in
     имеющей максимальный по модулю элемент в i-том столбце.*/
 
     T max = std::abs(matrix[col][col]); // модуль значения элемента
-    int maxPos = col; // номер строки, на которой находится максимальный элемент
+    int max_pos = col; // номер строки, на которой находится максимальный элемент
 
-    for (int i = col + 1; i < rowsAmount; i++)
+    for (int i = col + 1; i < matrix_dimension; i++)
     {
         T element = std::abs(matrix[i][col]); // Берём новый элемент из столбца
         if (element > max) // Если значение по модулю нового элемента больше уже имеющегося максимума, то
         {
             max = element; // обновляем максимум
-            maxPos = i; // и запоминаем номер строки, на которой находится максимальный элемент
+            max_pos = i; // и запоминаем номер строки, на которой находится максимальный элемент
         }
     }
 
-    return maxPos;
+    return max_pos;
 }
 
 template<typename T>
-inline int triangulate_matrix(std::vector<std::vector<T>>& matrix, int rowsAmount)
+inline int TriangulateMatrix(std::vector<std::vector<T>>& matrix, int matrix_dimension)
 { // Здесь триангулируем матрицу (приводим матрицу к треугольному виду)
-    unsigned int swapCounter = 0; // количество перестановок строк
+    unsigned int swap_counter = 0; // количество перестановок строк
 
-    if (rowsAmount == 0) return swapCounter; // Если размерность матрицы = 0, то ничего не делаем
+    if (matrix_dimension == 0) return swap_counter; // Если размерность матрицы = 0, то ничего не делаем
     // Полагаем, что все строки матрицы имеют одинаковую длину
     const int num_cols = matrix[0].size(); // количество столбцов в матрице
-    unsigned int imax; // индекс (номер) максимального элемента в текущем столбце
+    unsigned int i_max; // индекс (номер) максимального элемента в текущем столбце
 
-    for (int i = 0; i < rowsAmount - 1; i++) // 'matrixDimension - 1', чтобы не рассматривать
+    for (int i = 0; i < matrix_dimension - 1; i++) // 'matrixDimension - 1', чтобы не рассматривать
     {                                               // столбец свободных членов матрицы
-        imax = find_max_inCol(matrix, i, rowsAmount); // Нашли индекс максимального элемента в солбце
+        i_max = FindMaxInCol(matrix, i, matrix_dimension); // Нашли индекс максимального элемента в солбце
 
-        if (i != imax) // Если текущий элемент не является максимальным, то
+        if (i != i_max) // Если текущий элемент не является максимальным, то
         {
-            swap(matrix[i], matrix[imax]); // переставляем строки
-            swapCounter++; // считаем количество таких операций, т. к. такое действие меняет знак определителя
+            std::swap(matrix[i], matrix[i_max]); // переставляем строки
+            swap_counter++; // считаем количество таких операций, т. к. такое действие меняет знак определителя
         }
 
-        for (int j = i + 1; j < rowsAmount; j++)
+        for (int j = i + 1; j < matrix_dimension; j++)
         {
             T coeff = -matrix[j][i] / matrix[i][i]; // вычислили коэффициент для обнуления элемента i-й строки
             for (int k = i; k < num_cols; k++)
@@ -71,30 +71,30 @@ inline int triangulate_matrix(std::vector<std::vector<T>>& matrix, int rowsAmoun
         }
     }
 
-    return swapCounter;
+    return swap_counter;
 }
 
 template<typename T>
-inline std::vector<T> gauss_solving(std::vector<std::vector<T>>& matrix, std::vector<T>& freeMatrixColumn, int rowsAmount)
+inline std::vector<T> SolveSequentially(std::vector<std::vector<T>>& matrix, std::vector<T>& freeMatrixColumn, int matrix_dimension)
 { // Здесь решаем СЛАУ методом Гаусса
-    std::vector<T> solution(rowsAmount); // результирующий вектор
+    std::vector<T> solution(matrix_dimension); // результирующий вектор
 
-    for (int i = 0; i < rowsAmount; i++)
+    for (int i = 0; i < matrix_dimension; i++)
         matrix[i].push_back(freeMatrixColumn[i]); // добавляем столбец свободных членов
 
-    triangulate_matrix(matrix, rowsAmount); // приводим матрицу к треугольному виду
+    TriangulateMatrix(matrix, matrix_dimension); // приводим матрицу к треугольному виду
 
     /*При использовании метода Гаусса для решения
     систем линейных алгебраических уравнений следует избегать приближенных вычислений*/
-    for (int i = rowsAmount - 1; i >= 0; i--)
+    for (int i = matrix_dimension - 1; i >= 0; i--)
     { // Обходим уравнения с конца матрицы
         if (std::abs(matrix[i][i]) < 0.0001)
-            throw no_solution();
+            throw NoSolution();
         //Уравнения перебираются начиная с последнего
-        for (int j = i + 1; j < rowsAmount; j++) // для каждого из них вычисляется сумма matrix[i][j] * solution[j]
-            matrix[i][rowsAmount] -= matrix[i][j] * solution[j];
+        for (int j = i + 1; j < matrix_dimension; j++) // для каждого из них вычисляется сумма matrix[i][j] * solution[j]
+            matrix[i][matrix_dimension] -= matrix[i][j] * solution[j];
 
-        solution[i] = matrix[i][rowsAmount] / matrix[i][i]; // находим значение корня текущего уравнения
+        solution[i] = matrix[i][matrix_dimension] / matrix[i][i]; // находим значение корня текущего уравнения
     }
 
     return solution;
