@@ -145,7 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gauss_parallel.h" />
-    <ClInclude Include="gauss_serial.h" />
+    <ClInclude Include="gauss_sequential.h" />
     <ClInclude Include="huge_matrix.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

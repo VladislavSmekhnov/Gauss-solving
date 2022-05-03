@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <omp.h>
-#include "gauss_serial.h"
+#include "gauss_sequential.h"
 #include "gauss_parallel.h"
 #include "huge_matrix.h"
 
