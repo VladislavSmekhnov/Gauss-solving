@@ -14,31 +14,27 @@ int main()
 {
     setlocale(LC_ALL, "utf-8");
 
-    double timeStart_s, timeEnd_s, tick_s;
-    double timeStart_p, timeEnd_p, tick_p;
-    std::vector<double> answer_s;
-    std::vector<double> answer_p;
-    int m; // количество строк
-    int n; // количество столбцов
+    double timeStart_s, timeEnd_s, tick_s; // время работы последовательной области
+    double timeStart_p, timeEnd_p, tick_p; // время работы параллельной области
+    std::vector<double> answer_s; // ответ последовательного решения
+    std::vector<double> answer_p; // ответ параллельного решения
+    int matrix_dimension; // размерность матрицы
     double value; // значение элемента массива
-    std::vector<std::vector<double>> matrix_s, matrix_p, matrixForChecking; // матрица элементов без столбца свободных членов
+    std::vector<std::vector<double>> matrix_s, matrix_p, matrix_for_checking; // матрица элементов без столбца свободных членов
     std::vector<double> freeMatrixColumn_s, freeMatrixColumn_p, freeMatrixColumnForChecking; // столбец свободных членов
 
-    printf("Решение СЛАУ методом Гаусса\n");
+    printf("Решение СЛАУ методом Гаусса\n\n");
     // Задаём размерность матрицы
-    printf("Укажите размерность матрицы\n");
-    printf("Количество строк: ");
-    std::cin >> m;
-    matrix_s.resize(m);
-    matrix_p.resize(m);
-    matrixForChecking.resize(m);
-    printf("Количество столбцов: ");
-    std::cin >> n;
+    printf("Укажите размерность матрицы: ");
+    std::cin >> matrix_dimension;
+    matrix_s.resize(matrix_dimension);
+    matrix_p.resize(matrix_dimension);
+    matrix_for_checking.resize(matrix_dimension);
+    printf("\nСоздаю матрицу размером: %d×%d", matrix_dimension, matrix_dimension);
+    create_huge_matrix(matrix_s, 5, matrix_dimension);
+    matrix_for_checking = matrix_p = matrix_s;
 
-    create_huge_matrix(matrix_s, 5, n);
-    matrixForChecking = matrix_p = matrix_s;
-
-    create_freeMatrixColumn(freeMatrixColumn_s, n);
+    create_freeMatrixColumn(freeMatrixColumn_s, matrix_dimension);
     freeMatrixColumnForChecking = freeMatrixColumn_p = freeMatrixColumn_s;
 
     //// Заполняем матрицу
@@ -64,15 +60,15 @@ int main()
     //}
 
     /* Последовательное решение : */
-    printf("\nРешаю...\n\n");
+    printf("\n\nРешаю...\n");
     printf("Последовательно...\n");
     timeStart_s = omp_get_wtime();
-    answer_s = gauss_solving(matrix_s, freeMatrixColumn_s, m);
+    answer_s = gauss_solving(matrix_s, freeMatrixColumn_s, matrix_dimension);
     timeEnd_s = omp_get_wtime();
     tick_s = omp_get_wtick();
     printf("Параллельно...\n");
     timeStart_p = omp_get_wtime();
-    answer_p = parallel_gauss_solving(matrix_p, freeMatrixColumn_p, m);
+    answer_p = parallel_gauss_solving(matrix_p, freeMatrixColumn_p, matrix_dimension);
     timeEnd_p = omp_get_wtime();
     tick_p = omp_get_wtick();
 
@@ -99,14 +95,14 @@ int main()
     printf("Точность таймера для последовательной области:\t%1f\n", tick_s);
     printf("Точность таймера для параллельной области:\t%1f\n\n", tick_p);
 
-    printf("\nПроверка решения:\n");
+    printf("Проверка решения:\n");
     /* Проверка последовательного решения */
     std::cout << std::boolalpha << "Последовательное решение верно:\t" <<
-        check_answer(answer_s, freeMatrixColumnForChecking, matrixForChecking) << std::endl;
+        check_answer(answer_s, freeMatrixColumnForChecking, matrix_for_checking) << std::endl;
 
     /* Проверка параллельного решения */
     std::cout << std::boolalpha << "Параллельное решение верно:\t" <<
-        check_answer(answer_p, freeMatrixColumnForChecking, matrixForChecking) << std::endl;
+        check_answer(answer_p, freeMatrixColumnForChecking, matrix_for_checking) << std::endl;
 
     system("pause");
     return 0;

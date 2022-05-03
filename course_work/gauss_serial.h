@@ -49,7 +49,7 @@ inline int triangulate_matrix(std::vector<std::vector<T>>& matrix, int rowsAmoun
     unsigned int swapCounter = 0; // количество перестановок строк
 
     if (rowsAmount == 0) return swapCounter; // Если размерность матрицы = 0, то ничего не делаем
-    // Полагаем, что все строки матрицы имеют одинаковую длину.
+    // Полагаем, что все строки матрицы имеют одинаковую длину
     const int num_cols = matrix[0].size(); // количество столбцов в матрице
     unsigned int imax; // индекс (номер) максимального элемента в текущем столбце
 
