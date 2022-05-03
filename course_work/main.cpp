@@ -27,37 +27,63 @@ int main()
     // Задаём размерность матрицы
     printf("Укажите размерность матрицы: ");
     std::cin >> matrix_dimension;
+    while (matrix_dimension < 2)
+    {
+        std::cerr << "Минимальный размер матрицы: 2×2! Попробуйте ещё раз." << std::endl;
+        printf("Укажите размерность матрицы: ");
+        std::cin >> matrix_dimension;
+    }
     matrix_s.resize(matrix_dimension);
     matrix_p.resize(matrix_dimension);
     matrix_for_checking.resize(matrix_dimension);
 
-    printf("\nСоздаю матрицу размером: %d×%d", matrix_dimension, matrix_dimension);
-    CreateHugeMatrix(matrix_s, 5, matrix_dimension); // генерируем 1 экземпляр
-    matrix_for_checking = matrix_p = matrix_s; // и все остальные одинаковые
-    CreateFreeMatrixColumn(freeMatrixColumn_s, matrix_dimension);
-    free_matrix_column_for_checking = freeMatrixColumn_p = freeMatrixColumn_s;
+    printf("\n1 - ввести значения для матрицы коэффициентов \'A\' и вектора свободных членов \'b\' вручную.\n");
+    printf("2 - сгенерировать все значения автоматически\n\n");
+    do
+    {
+        printf("Введите номер выбранного вами варианта: ");
+        std::cin >> value;
+        if (value != 1 && value != 2) std::cerr << "Введено неправильное значение! Попробуйте ещё раз." << std::endl;
+    } while (value != 1 && value != 2);
+    if (value == 1)
+    {
+        printf("Заполните матрицу (без столбца свободных членов):\n");
+        for (int i = 0; i < matrix_dimension; i++)
+        {
+            for (int j = 0; j < matrix_dimension; j++)
+            {
+                printf("\t");
+                std::cin >> value;
+                matrix_s[i].push_back(value);
+                matrix_p[i].push_back(value);
+                matrix_for_checking[i].push_back(value);
+            }
+        }
 
-    //// Заполняем матрицу
-    //printf("Заполните матрицу (без столбца свободных членов):\n");
-    //for (int i = 0; i < m; i++)
-    //{
-    //    for (int j = 0; j < n; j++)
-    //    {
-    //        std::cin >> value;
-    //        matrix_s[i].push_back(value);
-    //        matrix_p[i].push_back(value);
-    //        matrixForChecking[i].push_back(value);
-    //    }
-    //}
+        printf("Теперь заполните столбец свободных членов:\n");
+        for (int i = 0; i < matrix_dimension; i++)
+        {
+            printf("\t");
+            std::cin >> value;
+            freeMatrixColumn_s.push_back(value);
+            freeMatrixColumn_p.push_back(value);
+            free_matrix_column_for_checking.push_back(value);
+        }
+    }
+    else if (value == 2)
+    {
+        printf("\nСоздаю матрицу размером: %d×%d", matrix_dimension, matrix_dimension);
+        CreateHugeMatrix(matrix_s, 5, matrix_dimension);
+        matrix_for_checking = matrix_p = matrix_s;
+        CreateFreeMatrixColumn(freeMatrixColumn_s, matrix_dimension);
+        free_matrix_column_for_checking = freeMatrixColumn_p = freeMatrixColumn_s;
+    }
+    else
+        std::cerr << "Введено неправильное значение!" << std::endl;
 
-    //printf("Теперь заполните столбец свободных членов:\n");
-    //for (int i = 0; i < m; i++)
-    //{
-    //    std::cin >> value;
-    //    freeMatrixColumn_s.push_back(value);
-    //    freeMatrixColumn_p.push_back(value);
-    //    freeMatrixColumnForChecking.push_back(value);
-    //}
+
+    // Заполняем матрицу
+    
 
     /* Последовательное решение : */
     printf("\n\nРешаю...\n");
