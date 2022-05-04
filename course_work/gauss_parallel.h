@@ -31,7 +31,7 @@ inline int ParallelFindMaxInCol(const std::vector<std::vector<T>>& matrix, int c
     имеющей максимальный по модулю элемент в i-том столбце.*/
 
     int max_pos = col; // номер строки, на которой находится максимальный элемент
-    #pragma omp parallel shared(max_pos) num_threads(8)
+    #pragma omp parallel shared(max_pos)
     {
         T max = std::abs(matrix[col][col]); // модуль значения элемента
         #pragma omp for
@@ -76,7 +76,7 @@ inline int ParallelTriangulateMatrix(std::vector<std::vector<T>>& matrix, int ma
         {
             T coeff = -matrix[j][i] / matrix[i][i]; // вычислили коэффициент для обнуления элемента i-й строки
             
-            #pragma omp parallel for shared(num_cols) num_threads(8)
+            #pragma omp parallel for shared(num_cols)
             for (int k = i; k < num_cols; k++)
                 matrix[j][k] += matrix[i][k] * coeff; // обнуляем элемент и складываем строки
         }
@@ -89,8 +89,8 @@ template<typename T>
 inline std::vector<T> SolveInParallel(std::vector<std::vector<T>>& matrix, std::vector<T>& freeMatrixColumn, int matrix_dimension)
 { // Здесь решаем СЛАУ методом Гаусса
     std::vector<T> solution(matrix_dimension); // результирующий вектор
-
-    #pragma omp parallel for num_threads(8)
+    
+    #pragma omp parallel for
     for (int i = 0; i < matrix_dimension; i++)
         matrix[i].push_back(freeMatrixColumn[i]); // добавляем столбец свободных членов
 

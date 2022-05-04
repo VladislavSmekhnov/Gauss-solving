@@ -10,8 +10,6 @@
 void Keep4DigitsAfterPoint(std::vector<double>& v);
 void CreateNewFreeColumn(std::vector<double>& v, std::vector<double>& answer, std::vector<std::vector<double>> matrix);
 bool CheckAnswer(std::vector<double> answer, std::vector<double> freeMatrixCloumn, std::vector<std::vector<double>> matrix);
-template <typename T>
-void PrintVector(std::vector<T>& x);
 
 int main()
 {
@@ -20,6 +18,7 @@ int main()
     double timeStart_s, timeEnd_s, tick_s; // время работы последовательной области
     double timeStart_p, timeEnd_p, tick_p; // время работы параллельной области
     int matrix_dimension; // размерность матрицы
+    unsigned int number_of_threads;
     double value; // значение элемента массива
     std::vector<double> answer_s; // ответ последовательного решения
     std::vector<double> answer_p; // ответ параллельного решения
@@ -27,6 +26,10 @@ int main()
     std::vector<double> freeMatrixColumn_s, freeMatrixColumn_p, free_matrix_column_for_checking; // столбец свободных членов
 
     printf("Решение СЛАУ методом Гаусса\n\n");
+    printf("Задайте количество потоков: ");
+    std::cin >> number_of_threads;
+    omp_set_num_threads(number_of_threads);
+    printf("\n");
     // Задаём размерность матрицы
     printf("Укажите размерность матрицы: ");
     std::cin >> matrix_dimension;
