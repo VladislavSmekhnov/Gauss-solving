@@ -10,6 +10,8 @@
 void Keep4DigitsAfterPoint(std::vector<double>& v);
 void CreateNewFreeColumn(std::vector<double>& v, std::vector<double>& answer, std::vector<std::vector<double>> matrix);
 bool CheckAnswer(std::vector<double> answer, std::vector<double> freeMatrixCloumn, std::vector<std::vector<double>> matrix);
+template <typename T>
+std::string CompareComputationTime(T sequential_t, T parallel_t);
 
 int main()
 {
@@ -87,11 +89,6 @@ int main()
     else
         std::cerr << "Введено неправильное значение!" << std::endl;
 
-
-    // Заполняем матрицу
-    
-
-    
     printf("\n\nРешаю...\n");
 
     printf("Последовательно...\n");
@@ -109,10 +106,11 @@ int main()
     tick_p = omp_get_wtick();
     
     // Измеряем время, затраченное на решение СЛАУ обоими способами:
-    printf("\nВремя, затраченное в последовательной области:\t%1f\n", timeEnd_s - timeStart_s);
-    printf("Время, затраченное в параллельной области:\t%1f\n\n", timeEnd_p - timeStart_p);
-    printf("Точность таймера для последовательной области:\t%1f\n", tick_s);
-    printf("Точность таймера для параллельной области:\t%1f\n\n", tick_p);
+    std::cout << "\nВремя, затраченное в последовательной области:\t" << std::round((timeEnd_s - timeStart_s) * 10000) / 10000 << std::endl;
+    std::cout << "Время, затраченное в параллельной области:\t" << std::round((timeEnd_p - timeStart_p) * 10000) / 10000 << std::endl;
+    std::cout << CompareComputationTime(timeEnd_s - timeStart_s, timeEnd_p - timeStart_p) << std::endl;
+    printf("Точность таймера для последовательной области:\t%f\n", tick_s);
+    printf("Точность таймера для параллельной области:\t%f\n\n", tick_p);
 
     printf("Проверка решения:\n");
     /* Проверка последовательного решения */
@@ -128,6 +126,30 @@ int main()
 
     system("pause");
     return 0;
+}
+
+template <typename T>
+std::string CompareComputationTime(T sequential_t, T parallel_t)
+{
+    char buffer[256] = {};
+    sequential_t = std::round(sequential_t * 100) / 100;
+    parallel_t = std::round(parallel_t * 100) / 100;
+    
+    if (sequential_t < parallel_t)
+    {
+        _gcvt_s(buffer, 255, std::round((parallel_t / sequential_t) * 100) / 100, 5);
+        std::string result(buffer, sizeof(buffer));
+        return "Последовательные вычисления быстрее параллельных в " + result + " раза";
+    }
+    else if (parallel_t < sequential_t)
+    {
+        _gcvt_s(buffer, 255, std::round((sequential_t / parallel_t) * 100) / 100, 5);
+        std::string result(buffer, sizeof(buffer));
+        return "Параллельные вычисления быстрее последовательных в " + result + " раза";
+    }
+        
+    else
+        return "Время последовательных и параллельных вычислений одинаково";
 }
 
 bool CheckAnswer(std::vector<double> answer, std::vector<double> freeMatrixCloumn, std::vector<std::vector<double>> matrix)
